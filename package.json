@@ -1,10 +1,10 @@
 {
-  "name": "webpack-starter",
+  "name": "algolia-boolean-search",
   "version": "1.0.0",
-  "description": "Pre-configured starter including webpack, ESLint, Sass, Stylelint and other useful loaders and linters",
+  "description": "Boolean search with Algolia InstantSearch.js ⚡️",
   "main": "index.js",
   "repository": "https://github.com/gabrielecanepa/webpack-starter",
-  "author": "Gabriele Canepa <mail@gabrielecanepa.com>",
+  "author": "Gabriele Canepa <gabriele.canepa@algolia.com>",
   "license": "MIT",
   "scripts": {
     "setup": "yarn init && yarn upgrade --latest && touch .env",
@@ -19,7 +19,6 @@
     "@babel/preset-env": "^7.18.2",
     "babel-loader": "^8.2.5",
     "css-loader": "^6.7.1",
-    "dotenv-webpack": "^7.1.0",
     "eslint": "^8.16.0",
     "eslint-plugin-import": "^2.26.0",
     "html-loader": "^3.1.0",
@@ -33,5 +32,12 @@
     "webpack": "^5.72.1",
     "webpack-cli": "^4.9.2",
     "webpack-dev-server": "^4.9.0"
+  },
+  "dependencies": {
+    "algolia-filters-js-syntax-validator": "^1.0.2",
+    "algoliasearch": "^4.14.2",
+    "instantsearch.css": "^7.4.5",
+    "instantsearch.js": "^4.45.1",
+    "similarity": "^1.2.1"
   }
 }

@@ -4,8 +4,6 @@
 bin/
 build/
 dist/
+node_modules/
 .DS_Store
 .env
-node_modules/
-package-lock.json
-yarn.lock

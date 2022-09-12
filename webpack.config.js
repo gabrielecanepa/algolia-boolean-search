@@ -1,11 +1,12 @@
 const path = require('path')
 const packageJSON = require('./package.json')
 
-const Dotenv = require('dotenv-webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
+const mode = process.env.NODE_ENV || 'development'
+
 module.exports = {
-  mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
+  mode,
   devServer: {
     open: true,
   },
@@ -29,21 +30,29 @@ module.exports = {
       {
         test: /\.(sa|sc)ss$/,
         use: [
-          { loader: 'style-loader' },
+          {
+            loader: 'style-loader',
+          },
           {
             loader: 'css-loader',
             options: {
-              modules: true,
+              modules: false,
             },
           },
-          { loader: 'sass-loader' },
+          {
+            loader: 'sass-loader',
+          },
         ],
       },
       {
         test: /\.css$/,
         use: [
-          { loader: 'style-loader' },
-          { loader: 'css-loader' },
+          {
+            loader: 'style-loader',
+          },
+          {
+            loader: 'css-loader',
+          },
         ],
       },
       {
@@ -53,7 +62,6 @@ module.exports = {
     ],
   },
   plugins: [
-    new Dotenv(),
     new HtmlWebpackPlugin({
       template: './index.html',
       meta: {

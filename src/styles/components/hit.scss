@@ -1,0 +1,46 @@
+.ais-Hits-item {
+  display: flex;
+  align-items: center;
+}
+
+.ais-Hits-item__image {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  border: 1px solid #eee;
+  border-radius: 8px;
+}
+
+.ais-Hits-item__content {
+  flex: 1;
+  padding-left: 2rem;
+}
+
+.ais-Hits-item__title {
+  margin-bottom: 0.2em;
+}
+
+.ais-Hits-item__category {
+  margin: 0;
+  color: #666;
+}
+
+.ais-Hits-item__brand {
+  margin: 0.2em 0 0;
+  font-size: 0.8rem;
+  font-weight: bolder;
+  color: darkslateblue;
+  cursor: pointer;
+}
+
+.ais-Hits-item__brand:hover {
+  text-decoration: underline;
+}
+
+.ais-Hits-item__color {
+  margin-top: 0.4em;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1.5px solid #eee;
+}
