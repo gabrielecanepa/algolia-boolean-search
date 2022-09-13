@@ -11,7 +11,7 @@ const filtersValidator = new FiltersValidator()
 /**
  * Regex identifying `and`, `or`, `not`, `-` and `*` operators.
  */
-const BOOLEAN_REGEX = /(\sand\s|\sor\s|\s?not\s|\s?-\w+\s?|\w+\*|\*\w+)/gi
+const BOOLEAN_REGEX = /(\sand\s|\sor\s|\s?not\s|\w+\*|\*\w+|\w+:\w+)/gi
 
 /**
  * Parse a search query and test if it includes boolean operators.

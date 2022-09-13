@@ -2,7 +2,7 @@ import algoliasearch from 'algoliasearch'
 import instantsearch from 'instantsearch.js'
 import { configure, hits, pagination, panel, refinementList, searchBox } from 'instantsearch.js/es/widgets'
 
-import { fetchFacetsList, isBooleanSearch, useBooleanSearch } from '@/utils/boolean-search'
+import { fetchFacetsList, isBooleanSearch, useBooleanSearch } from '@/utils/search'
 import { titleizeItems } from '@/utils/string'
 import { hit as hitTemplate } from '@/components'
 
@@ -10,39 +10,38 @@ const searchClient = algoliasearch('0UI9MOXMX5', '1d30c6a6ea8a7dfcc9797671c39723
 const index = searchClient.initIndex('boolean_search')
 
 const runDefaultSearch = (helper, params = {}) => {
-  const { filters = '', page = 0 } = params
+  const { query = '', page = 0 } = params
 
   helper
-    .setQueryParameter('optionalWords', ['and', 'or'])
-    .setQueryParameter('advancedSyntax', true)
-    .setQueryParameter('filters', filters)
-    .setPage(page) // the page needs to be reset
+    .setQuery(query)
+    .setQueryParameter('advancedSyntax', true) // enable advanted syntax for default search
+    .setQueryParameter('filters', '') // reset eventual filters
+    .setPage(page) // the page needs to be set again
     .search()
 }
 
-const runBooleanSearch = async (helper, params = {}) => {
-  const { query = '', filters = '', page = 0 } = params
+const runBooleanSearch = (helper, params = {}) => {
+  const { filters = '', page = 0 } = params
 
-  await helper
-    // .setQuery('') // everything is handled by the filters
-    .setQueryParameter('optionalWords', query.split(' ')) // all words should be optional, as results are handled by filters
-    .setQueryParameter('removeWordsIfNoResults', 'allOptional') // remove if there are no results
-    .setQueryParameter('advancedSyntax', false) // already handled by useBooleanSearch
+  helper
+    .setQuery('') // results are handled by the filters
     .setQueryParameter('filters', filters)
+    .setQueryParameter('advancedSyntax', false) // not needed here
     .setPage(page)
     .search()
 }
 
 const searchFunction = helper => {
-  const { query, page } = helper.getQuery()
+  const { query: initialQuery, page } = helper.getQuery()
+  const query = initialQuery.trim()
 
   if (isBooleanSearch(query)) {
     const { filters, errorMessage } = useBooleanSearch(query)
-    if (!filters || errorMessage) return runDefaultSearch(helper, { page })
+    if (!filters || errorMessage) return runDefaultSearch(helper, { query, page })
     return runBooleanSearch(helper, { query, filters, page })
   }
 
-  return runDefaultSearch(helper, { page })
+  return runDefaultSearch(helper, { query, page })
 }
 
 const search = instantsearch({
