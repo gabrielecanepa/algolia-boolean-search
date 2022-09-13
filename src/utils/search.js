@@ -131,7 +131,7 @@ const buildFilter = (type, value) => {
  * @returns {string | null} Composed filter or `null` if `matches` is empty
  */
 const buildMultipleFilters = matches => {
-  if (!matches) return null
+  if (!matches || matches.length === 0) return null
 
   return matches
     .map(match => {
@@ -162,18 +162,19 @@ const parseFilter = value => {
     return buildMultipleFilters(matches)
   }
 
-  // Try exact match first
-  let facetTypeAndValue = findFacetTypeAndValue(value, (a, b) => a.toLowerCase() === b.toLowerCase())
-  // Return if quoted single word
+  // Return exact match if quoted single word
   if (isDoubleQuoted(value) && !value.match(/\s/)) {
+    const facetTypeAndValue = findFacetTypeAndValue(value, (a, b) => a.toLowerCase() === b.toLowerCase())
     if (!facetTypeAndValue) return null
     return buildFilter(facetTypeAndValue.type, facetTypeAndValue.value)
   }
 
-  // If no exact match, try to find match with the highest similarity (see https://npmjs.com/package/similarity)
-  if (!facetTypeAndValue) {
-    facetTypeAndValue = findSimilarFacetTypeAndValue(value)
-  }
+  // Try multiple exact match
+  const matches = findMultipleFacetTypeAndValue(value, (a, b) => a.toLowerCase() === b.toLowerCase())
+  if (matches.length > 0) return buildMultipleFilters(matches)
+
+  // If no exact match, try to find one match with the highest similarity (see https://npmjs.com/package/similarity)
+  const facetTypeAndValue = findSimilarFacetTypeAndValue(value)
 
   if (!facetTypeAndValue) return null
 
@@ -234,11 +235,13 @@ export const useBooleanSearch = booleanQuery => {
 
   const filters = filtersList.map((filter, i) => {
     let formattedFilter = filter
+    const previousFilter = filtersList[i - 1]
 
     // Add parentheses around composed filters
-    if (filtersList.length > 1 && filter.includes(' OR ')) formattedFilter = `(${filter})`
+    if (filtersList.length > 1 && previousFilter !== 'OR' && filter.includes(' OR '))
+      formattedFilter = `(${filter})`
     // Prepend AND if the previous item is not AND or OR
-    if (i > 0 && !filter.match(/^(and|or)$/i) && !filtersList[ i - 1 ].match(/^(and|or)$/i))
+    if (i > 0 && !filter.match(/^(and|or)$/i) && !previousFilter.match(/^(and|or)$/i))
       formattedFilter = `AND ${formattedFilter}`
 
     return formattedFilter
