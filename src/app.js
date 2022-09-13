@@ -9,6 +9,12 @@ import { hit as hitTemplate } from '@/components'
 const searchClient = algoliasearch('0UI9MOXMX5', '1d30c6a6ea8a7dfcc9797671c39723db')
 const index = searchClient.initIndex('boolean_search')
 
+// Keep track of the search state
+const state = {
+  query: '',
+  page: 0,
+}
+
 const runDefaultSearch = (helper, params = {}) => {
   const { query = '', page = 0 } = params
 
@@ -32,8 +38,13 @@ const runBooleanSearch = (helper, params = {}) => {
 }
 
 const searchFunction = helper => {
-  const { query: initialQuery, page } = helper.getQuery()
-  const query = initialQuery.trim()
+  const { query: userQuery, page } = helper.getQuery()
+  let query = userQuery.trim()
+
+  // Use previous query on page change for boolean search
+  if (query !== state.query && page !== state.page) query = state.query
+  state.query = query
+  state.page = page
 
   if (isBooleanSearch(query)) {
     const { filters, errorMessage } = useBooleanSearch(query)
