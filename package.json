@@ -1,13 +1,12 @@
 {
   "name": "algolia-boolean-search",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Boolean search with Algolia InstantSearch.js ⚡️",
   "main": "index.js",
-  "repository": "https://github.com/gabrielecanepa/webpack-starter",
+  "repository": "https://github.com/gabrielecanepa/algolia-boolean-search",
   "author": "Gabriele Canepa <gabriele.canepa@algolia.com>",
   "license": "MIT",
   "scripts": {
-    "setup": "yarn init && yarn upgrade --latest && touch .env",
     "start": "webpack-dev-server",
     "dev": "webpack-dev-server --mode development",
     "build": "webpack build --mode production",
