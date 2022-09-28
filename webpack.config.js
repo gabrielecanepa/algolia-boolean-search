@@ -63,9 +63,14 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: './index.html',
+      template: path.resolve(__dirname, 'index.html'),
+      favicon: path.resolve(__dirname, 'public', 'favicon.ico'),
       meta: {
         description: packageJSON.description,
+      },
+      link: {
+        rel: 'stylesheet',
+        href: 'https://cdn.jsdelivr.net/npm/instantsearch.css@7/themes/satellite-min.css',
       },
     }),
   ],

@@ -1,27 +1,21 @@
-# Webpack Starter
+# Algolia Boolean Search
 
-Ready-to-use webpack starter including:
-
-- [webpack](https://webpack.js.org)
-- [Babel](https://babeljs.io) with [the latest preset](https://babeljs.io/docs/en/babel-preset-env)
-- [ESLint](https://eslint.org)
-- [Sass](http://sass-lang.com) with [stylelint](https://stylelint.io) and hot reloading
-- [HtmlWebpackPlugin](https://webpack.js.org/plugins/html-webpack-plugin)
-
-And other useful loaders and linters.
+Boolean search with Algolia InstantSearch.js ⚡️
 
 ## Usage
 
 Clone the repository to your computer. You must have [Node.js](https://nodejs.org) (> v4) and [Yarn](https://yarnpkg.com/lang/en/docs/install) installed:
 
 ```bash
-git clone git@github.com:gabrielecanepa/webpack-starter.git my-project
-# or `gh repo clone gabrielecanepa/webpack-starter my-project`
+git clone git@github.com:gabrielecanepa/algolia-boolean-search.git
+# or
+gh repo clone gabrielecanepa/algolia-boolean-search
 
-cd my-project
+cd algolia-boolean-search
 
-# Install packages and run the app
-yarn setup
+# Install packages and run the app in development mode
+yarn
+yarn dev
 ```
 
 ### Scripts

@@ -100,7 +100,7 @@ const findSimilarFacetTypeAndValue = word =>
     const match = facetsList[facet].reduce((similarValue, facetValue) => {
       const similarityScore = similarity(normalizeWord(word), facetValue)
 
-      if (similarityScore > 0.5 && (!similarValue || similarityScore > similarValue.similarityScore))
+      if (similarityScore > 0.8 && (!similarValue || similarityScore > similarValue.similarityScore))
         return { facetValue, similarityScore }
 
       return similarValue
@@ -191,14 +191,22 @@ const getFilter = word => {
   if (word.match(/^(and|or|not)$/i)) return word.toUpperCase()
 
   if (word.startsWith('-')) {
-    const endsWithParens = word.endsWith(')')
-    const filter = parseFilter(endsWithParens ? word.slice(1, -1) : word.slice(1))
-    return filter ? (endsWithParens ? `NOT ${filter})` : `NOT ${filter}`) : null
+    const lastChar = word.at(-1) === ')' ? ')' : ''
+
+    const filter = parseFilter(lastChar === ')' ? word.slice(1, -1) : word.slice(1))
+    if (!filter) return null
+
+    const words = filter.split(' ')
+
+    if (words.length === 0) return `NOT ${filter}${lastChar}`
+    const facets = words.filter(w => w !== 'OR')
+    return `NOT ${facets[0]}${facets.slice(1).map(facet => ` AND NOT ${facet}`)}${lastChar}`
   }
   if (word.startsWith('(')) {
-    const isExclusion = word[1] && word[1] === '-'
-    const filter = parseFilter(isExclusion ? word.slice(2) : word.slice(1))
-    return filter ? (isExclusion ? `(NOT ${filter}` : `(${filter}`) : null
+    if (word[1] && word[1] === '-') return `(${getFilter(word.slice(1))})`
+
+    const filter = parseFilter(word.slice(1))
+    return filter ? `(${filter}` : null
   }
   if (word.endsWith(')')) {
     const filter = parseFilter(word.slice(0, -1))
@@ -233,19 +241,39 @@ export const useBooleanSearch = booleanQuery => {
     filtersList.push(filter)
   }
 
-  const filters = filtersList.map((filter, i) => {
+  // Join filters with parentheses
+  for (const [i, filter] of filtersList.entries()) {
+    if (filter.startsWith('(')) {
+      const j = filtersList.findIndex((f, j) => j > i && f.endsWith(')'))
+      if (!filtersList[j]) break
+
+      filtersList[i] = filtersList[i].slice(1)
+      filtersList[j] = filtersList[j].slice(0, -1)
+      filtersList = [...filtersList.slice(0, i), filtersList.slice(i, j + 1).join(' ')]
+    }
+  }
+
+  const filters = filtersList.reduce((mappedFiltersList, filter, i) => {
     let formattedFilter = filter
-    const previousFilter = filtersList[i - 1]
+    const previousFilter = mappedFiltersList[i - 1]
 
     // Add parentheses around composed filters
-    if (filtersList.length > 1 && previousFilter !== 'OR' && filter.includes(' OR '))
-      formattedFilter = `(${filter})`
+    if (filtersList.length > 1 && i > 0 && previousFilter !== 'OR' && filter.includes(' OR ')) {
+      // Handle multiple negations
+      if (previousFilter === 'NOT') {
+        const values = filter.split(' OR ')
+        formattedFilter = values.map(v => `NOT ${v}`).join(' AND ')
+        mappedFiltersList.pop()
+      }
+      if (mappedFiltersList.at(-1)) formattedFilter = `(${formattedFilter})`
+    }
     // Prepend AND if the previous item is not AND or OR
-    if (i > 0 && !filter.match(/^(and|or)$/i) && !previousFilter.match(/^(and|or)$/i))
+    if (i > 0 && !filter.match(/^(and|or|not)$/i) && !previousFilter.match(/^(and|or|not)$/i)) {
       formattedFilter = `AND ${formattedFilter}`
+    }
 
-    return formattedFilter
-  }).join(' ')
+    return [...mappedFiltersList, formattedFilter]
+  }, []).join(' ')
 
   const { errorMessage } = filtersValidator.parse(filters)
 
